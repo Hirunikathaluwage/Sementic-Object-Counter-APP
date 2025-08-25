@@ -1,19 +1,21 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config()
 
-const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const analyseImage = async(imagePath)=> {
     try{
       const buffer = fs.readFileSync(imagePath);    //read image and convert it to a base64 
       const base64Data  = buffer.toString("base64");
 
-      const mimeType = "image/png/";
-      const input = "How many objects are in this image?";
+      const mimeType = "image/png";
+      const input = "Count and list objects in this image. Return JSON.";
       
-      const result = await ai.models.generateContent({
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const result = await model.generateContent({
         model:"gemini-1.5-flash",
         contents:[
           {
@@ -24,11 +26,11 @@ export const analyseImage = async(imagePath)=> {
             ]
           },
         ],
-        generationConfig: { mimeType:"application/json"},
+        generationConfig: { responseMimeType: "application/json" },
 
       });
 
-      return JSON.parse(result.responseId.text)
+       return JSON.parse(result.response.candidates[0].content.parts[0].text);
 
     }catch(error){
       console.error("Error in analyzing", error.message);
