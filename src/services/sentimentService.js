@@ -11,9 +11,14 @@ export const analyseImage = async(imagePath)=> {
       const base64Data  = buffer.toString("base64");
 
       const mimeType = "image/png";
-      const input = "Count and list objects in this image. Return JSON.";
+       const input = `
+      Look at this image and return only valid JSON with:
+      - scene: a short description of what the image shows
+      - mood: the overall feeling or sentiment (happy, sad, calm, energetic, neutral)
+      - tags: array of important objects, people, animals, or scene details`;
+
       
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });  
 
       const result = await model.generateContent({
         model:"gemini-1.5-flash",
